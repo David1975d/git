@@ -196,7 +196,7 @@ class Service:
             selected=set(review_ids) if review_ids is not None else None
             if selected is not None and not selected.issubset({r['review_id'] for r in task['records']}):
                 raise Problem(422,'invalid_review_selection','所选评价不属于当前批次，请刷新后重试。')
-            adopted, existing, pending = [], [], []
+            adopted, existing, pending, confirmed = [], [], [], []
             for review in task['records']:
                 if selected is not None and review['review_id'] not in selected:
                     continue
@@ -205,12 +205,19 @@ class Service:
                         pending.append(review['review_id']);continue
                 elif review.get('comment_type')!='general_positive' or review['execution']!='completed' or review['feedback']:
                     continue
-                if review.get('reply_text','').strip():
-                    existing.append(review['review_id']); continue
                 if not organized and not praise_reply_allowed(review):
                     pending.append(review['review_id']); continue
                 before = {k:copy.deepcopy(review.get(k,'')) for k in ('reply_text','reply_basis','reply_confirmed','reply_confirmed_at')}
-                review['reply_text'] = handling_guidance(review)[1]
+                has_reply=bool(review.get('reply_text','').strip())
+                if has_reply:
+                    existing.append(review['review_id'])
+                    if review.get('reply_basis')!=reply_basis(review):
+                        pending.append(review['review_id']);continue
+                    if review.get('reply_confirmed'):
+                        continue
+                else:
+                    review['reply_text'] = handling_guidance(review)[1]
+                    adopted.append(review['review_id'])
                 review['reply_basis'] = reply_basis(review)
                 review['reply_confirmed'] = True
                 review['reply_confirmed_at'] = time.time()
@@ -218,13 +225,13 @@ class Service:
                     'review_id':review['review_id'],'before':before,
                     'after':{k:copy.deepcopy(review[k]) for k in ('reply_text','reply_basis','reply_confirmed','reply_confirmed_at')},
                     'reason':'批量采用已整理评价推荐为最终回复' if organized else '批量采用一般好评推荐为最终回复'})
-                adopted.append(review['review_id'])
-            if adopted:
+                confirmed.append(review['review_id'])
+            if confirmed:
                 task['version'] += 1
                 self.store.event(db,identifier,'organized_replies_adopted' if organized else 'praise_replies_adopted',{'adopted':adopted,
-                    'skipped_existing':existing,'skipped_pending':pending,'model_calls':0})
+                    'preserved_existing':existing,'confirmed':confirmed,'skipped_pending':pending,'model_calls':0})
                 self.store.put_task(db,task)
-            return task, {'saved':len(adopted),'existing':len(existing),'pending':len(pending)}
+            return task, {'saved':len(adopted),'existing':len(existing),'pending':len(pending),'confirmed':len(confirmed)}
 
     def edit(self, owner, identifier, review_id, version, feedback, reviewed, reason, review_note=None, review_resolution=None, reply_text=None, reply_confirmed=None):
         with self.store.transaction() as db:

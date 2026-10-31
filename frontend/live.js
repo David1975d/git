@@ -14,7 +14,7 @@ const finalReplySaved = r => r.reply?.source==='人工编辑';
 const bulkPraiseButton=document.createElement('button');
 bulkPraiseButton.id='bulk-organized-reply';bulkPraiseButton.type='button';
 bulkPraiseButton.className='button button-primary button-small';
-bulkPraiseButton.title='保存当前筛选范围内所有分页的已整理评价推荐；已有最终回复不覆盖。';
+bulkPraiseButton.title='保存并确认当前筛选范围内所有分页的已整理评价回复；已有文本保留。';
 bulkPraiseButton.hidden=true;$('#review-shortcuts').after(bulkPraiseButton);
 bulkPraiseButton.onclick=async()=>{
   if(operationBusy||activeTask()||!isLive())return;
@@ -25,8 +25,8 @@ bulkPraiseButton.onclick=async()=>{
     const result=await jsonApi(taskPath()+'/replies/adopt-organized',{method:'POST',body:JSON.stringify({version:liveTask.version,review_ids:reviewIds})});
     await refreshTask();await refreshHistory();
     const a=result.adoption;
-    toast(a.saved?`已保存${a.saved}条回复${a.existing?`，${a.existing}条已有回复保留`:''}${a.pending?`，${a.pending}条待核查`:''}`:
-      a.pending?'仍有评论需要核查，已有回复已保留':a.existing?'已有回复已保留，无需重复保存':'当前没有需要保存的回复');
+    toast(a.confirmed?`已确认${a.confirmed}条回复${a.pending?`，${a.pending}条待核查`:''}`:
+      a.pending?'部分回复依据已变化，请先核查':a.existing?'回复均已确认':'当前没有可确认的回复');
   } catch(error){showError(error);}
   finally{operationBusy=false;render();}
 };
