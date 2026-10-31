@@ -1,0 +1,4 @@
+main_text,review_id,followup_text,source_ref,flavor,specification,platform_rating
+"【虚构示例】奶茶赠品好喝，主商品茉莉轻乳还没拆。",EXAMPLE-001,"【虚构示例】今天喝了主商品，味道太甜，喝不下。","虚构材料；非平台评价",茉莉轻乳,,超赞
+"【虚构示例】摇了一分钟还是有结块，杯底有残留。",EXAMPLE-002,,"虚构材料；非平台评价",,,非常差
+"【虚构示例】包装完整，但桶看起来比以前小，不知道克数有没有变。",EXAMPLE-003,,"虚构材料；非平台评价",,,

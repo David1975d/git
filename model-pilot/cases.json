@@ -1,0 +1,11 @@
+{
+  "source_type": "synthetic_development_cases",
+  "note": "全部为人工虚构，仅用于首次接入与规则检查，不是iHerb评价或独立验收集。",
+  "cases": [
+    {"review_id":"PILOT-001","main_text":"巧克力味不太甜，摇几下就匀了。","followup_text":"","focus":"基础口味、冲调正向表达"},
+    {"review_id":"PILOT-002","main_text":"封口边缘破了，不过里面的粉没有洒出来。","followup_text":"","focus":"包装负向，不扩大为内容物污染或质量结论"},
+    {"review_id":"PILOT-003","main_text":"赠送的奶茶味好喝，主商品香草味还没有打开。","followup_text":"今天喝了主商品，香草味太甜，喝不下。","focus":"赠品排除，主商品追评口味负向"},
+    {"review_id":"PILOT-004","main_text":"真不错，喝一杯还能顺便练咀嚼能力。","followup_text":"","focus":"反讽与冲调体验，不能仅因不错判为正向"},
+    {"review_id":"PILOT-005","main_text":"桶很大，打开只有半桶。我没有称重，不知道有没有少。","followup_text":"","focus":"规格疑虑，不认定缺斤少两"}
+  ]
+}
